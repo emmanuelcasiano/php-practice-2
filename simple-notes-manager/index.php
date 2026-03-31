@@ -2,10 +2,38 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/src/Note.php';
+require_once __DIR__ . '/src/NoteManager.php'; // must ensure the class definition is available before you initialize the session_start()
+
 session_start();
 
-require_once __DIR__ . '/src/Note.php';
-require_once __DIR__ . '/src/NoteManager.php';
+// ── SESSION INIT ─────────────────────────────────────
+if (!isset($_SESSION['notes'])) {
+    $_SESSION['notes'] = [];
+}
+
+$note = new NoteManager($_SESSION['notes']);
+
+// ── HANDLE POST ─────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // ADD
+    if (isset($_POST['add_note'])) {
+        echo 'Adding note...<br/>';
+        $note->addNote(new Note(
+            $_POST['title'],
+            $_POST['content']
+        ));
+    }
+
+    $_SESSION['notes'] = $note->notes;
+
+    header("Location: index.php");
+    exit;
+}
+
+echo '<pre>';
+print_r($_SESSION['notes']);
+echo '</pre>';
 ?>
 
 <!DOCTYPE html>
@@ -25,13 +53,8 @@ require_once __DIR__ . '/src/NoteManager.php';
             <h2>Add Note</h2>
             <form method="POST">
                 <input type="text" name="title" placeholder="Title" required>
-                <textarea name="description" placeholder="Description"></textarea>
-                <select name="priority">
-                    <option value="low">Low</option>
-                    <option value="normal">Normal</option>
-                    <option value="high">High</option>
-                </select>
-                <button type="submit" name="add_task">Add</button>
+                <textarea name="content" placeholder="Content"></textarea>
+                <button type="submit" name="add_note">Add</button>
             </form>
         </div>
         <div class="section">
@@ -113,13 +136,13 @@ require_once __DIR__ . '/src/NoteManager.php';
                 <h2>Add Note</h2>
                 <form method="POST">
                     <input type="text" name="title" placeholder="Title" required>
-                    <textarea name="description" placeholder="Description"></textarea>
+                    <textarea name="content" placeholder="Content"></textarea>
                     <select name="priority">
                         <option value="low">Low</option>
                         <option value="normal">Normal</option>
                         <option value="high">High</option>
                     </select>
-                    <button type="submit" name="add_task">Add</button>
+                    <button type="submit" name="add_note">Add</button>
                 </form>
             </div>
         </div>
