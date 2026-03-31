@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 class Note
 {
-    private static int $nextId = 1;
-    public readonly int $id;
+    public int $id;
     public bool $isPinned = true;
     public string $createdAt;
 
@@ -14,7 +13,7 @@ class Note
         public string $content = '',
         public array $tags = [],
     ) {
-        $this->id = self::$nextId++;
+        $this->id = 0;
         $this->createdAt = date('Y-m-d H:i:s');
     }
 
@@ -31,5 +30,10 @@ class Note
     public function __toString(): string
     {
         return "#{$this->id} {$this->title} [{$this->content}] <i>{$this->createdAt}</i>";
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 }

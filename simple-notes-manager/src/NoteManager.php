@@ -15,7 +15,8 @@ class NoteManager
 
     public function addNote(Note $note): static
     {
-        $this->notes[] = $note;
+        $note->setId(count($this->notes) + 1);
+        $this->notes[$note->id] = $note;
         return $this;
     }
 
