@@ -18,11 +18,24 @@ $note = new NoteManager($_SESSION['notes']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ADD
     if (isset($_POST['add_note'])) {
-        echo 'Adding note...<br/>';
         $note->addNote(new Note(
             $_POST['title'],
             $_POST['content']
         ));
+    }
+
+    //DELETE
+    if (isset($_POST['delete_id'])) {
+        $note->deleteNote((int)$_POST['delete_id']);
+    }
+
+    //UPDATE
+    if (isset($_POST['update_note'])) {
+        $note->updateNote(
+            (int)$_POST['id'],
+            $_POST['title'],
+            $_POST['content']
+        );
     }
 
     $_SESSION['notes'] = $note->notes;
@@ -31,9 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-echo '<pre>';
-print_r($_SESSION['notes']);
-echo '</pre>';
+// ── EDIT MODE (GET) ─────────────────────────────────
+$editNote = null;
+if (isset($_GET['edit'])) {
+    $editNote = $note->getNote((int)$_GET['edit']);
+}
+
+$notes = $note->getNotes();
 ?>
 
 <!DOCTYPE html>
@@ -52,79 +69,40 @@ echo '</pre>';
         <div class="section">
             <h2>Add Note</h2>
             <form method="POST">
-                <input type="text" name="title" placeholder="Title" required>
-                <textarea name="content" placeholder="Content"></textarea>
-                <button type="submit" name="add_note">Add</button>
+                <input type="hidden" name="id" value="<?= $editNote->id ?? '' ?>">
+
+                <input type="text" name="title" value="<?= $editNote->title ?? '' ?>" placeholder="Title" required>
+
+                <textarea name="content" placeholder="Content"><?= $editNote->content ?? '' ?></textarea>
+
+                <?php if ($editNote): ?>
+                    <button name="update_note">Update</button>
+                    <a href="index.php">Cancel</a>
+                <?php else: ?>
+                    <button type="submit" name="add_note">Add</button>
+                <?php endif; ?>
             </form>
         </div>
         <div class="section">
             <h2>Notes</h2>
 
             <div class="notes">
-                <div class="note">
-                    <h3>Lorem ipsum dolor sit amet consectetur adipisicing elit.</h3>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequuntur placeat nulla repellendus, reiciendis animi nam officiis aut, ducimus qui esse ea! Ipsum dolorum recusandae dicta. Sapiente excepturi laudantium modi nam.</p>
-                    <div class="actions">
-                        <button class="complete">Complete</button>
-                        <button class="delete">Delete</button>
+                <?php
+                foreach ($notes as $note) {
+                ?>
+                    <div class="note">
+                        <h3><?= $note->title ?></h3>
+                        <p><?= $note->content ?></p>
+                        <div class="actions">
+                            <a href="?edit=<?= $note->id ?>">Edit</a>
+                            <form method="POST">
+                                <input type="hidden" name="delete_id" value="<?= $note->id ?>">
+                                <button>Delete</button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                <div class="note">
-                    <h3>Title</h3>
-                    <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Mollitia nihil impedit explicabo? Labore quisquam, aspernatur provident dignissimos, nam eaque culpa obcaecati at quibusdam fuga dicta earum veritatis ducimus necessitatibus! Dolor aspernatur suscipit sequi dolores! Sapiente minima natus veritatis unde impedit totam debitis soluta. Corporis aperiam optio possimus eos porro totam!</p>
-                    <div class="actions">
-                        <button class="complete">Complete</button>
-                        <button class="delete">Delete</button>
-                    </div>
-                </div>
-                <div class="note">
-                    <h3>Title</h3>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequuntur placeat nulla repellendus, reiciendis animi nam officiis aut, ducimus qui esse ea! Ipsum dolorum recusandae dicta. Sapiente excepturi laudantium modi nam.</p>
-                    <div class="actions">
-                        <button class="complete">Complete</button>
-                        <button class="delete">Delete</button>
-                    </div>
-                </div>
-                <div class="note">
-                    <h3>Title</h3>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequuntur placeat nulla repellendus, reiciendis animi nam officiis aut, ducimus qui esse ea! Ipsum dolorum recusandae dicta. Sapiente excepturi laudantium modi nam.</p>
-                    <div class="actions">
-                        <button class="complete">Complete</button>
-                        <button class="delete">Delete</button>
-                    </div>
-                </div>
-                <div class="note">
-                    <h3>Title</h3>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequuntur placeat nulla repellendus, reiciendis animi nam officiis aut, ducimus qui esse ea! Ipsum dolorum recusandae dicta. Sapiente excepturi laudantium modi nam.</p>
-                    <div class="actions">
-                        <button class="complete">Complete</button>
-                        <button class="delete">Delete</button>
-                    </div>
-                </div>
-                <div class="note">
-                    <h3>Title</h3>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequuntur placeat nulla repellendus, reiciendis animi nam officiis aut, ducimus qui esse ea! Ipsum dolorum recusandae dicta. Sapiente excepturi laudantium modi nam.</p>
-                    <div class="actions">
-                        <button class="complete">Complete</button>
-                        <button class="delete">Delete</button>
-                    </div>
-                </div>
-                <div class="note">
-                    <h3>Lorem, ipsum dolor.</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus dolores voluptatum dolor sed eius atque nisi corporis recusandae praesentium! Odit cum, esse nulla iusto similique ducimus non quos molestias sit, atque iure nobis modi repudiandae reprehenderit incidunt aspernatur nostrum illo asperiores, harum porro sunt ut placeat! Veniam, velit quam distinctio autem, fugiat qui hic eaque consectetur nam obcaecati perspiciatis alias.</p>
-                    <div class="actions">
-                        <button class="complete">Complete</button>
-                        <button class="delete">Delete</button>
-                    </div>
-                </div>
-                <div class="note">
-                    <h3>Lorem ipsum dolor sit.</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab molestias numquam saepe quidem nemo iste libero necessitatibus, ducimus tempore sunt quasi, ipsum aspernatur omnis dolores.</p>
-                    <div class="actions">
-                        <button class="complete">Complete</button>
-                        <button class="delete">Delete</button>
-                    </div>
-                </div>
+                <?php } ?>
+
             </div>
         </div>
 

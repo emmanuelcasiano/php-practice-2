@@ -20,6 +20,24 @@ class NoteManager
         return $this;
     }
 
+    public function deleteNote(int $id): void
+    {
+        unset($this->notes[$id]);
+    }
+
+    public function updateNote(int $id, string $title, string $content): void
+    {
+        if (isset($this->notes[$id])) {
+            $this->notes[$id]->title = $title;
+            $this->notes[$id]->content = $content;
+        }
+    }
+
+    public function getNote(int $id): ?Note
+    {
+        return $this->notes[$id] ?? null;
+    }
+
     public function getNotes(): array
     {
         return $this->notes;
