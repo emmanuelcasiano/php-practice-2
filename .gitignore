@@ -1,0 +1,31 @@
+# Ignore local environment files
+.env
+.env.*
+
+# Ignore PHP dependencies in any subfolder
+**/vendor/
+
+# Ignore runtime and cache files
+*.log
+*.cache
+phpunit.result.cache
+
+# Ignore editor/project settings
+/.idea/
+/.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Ignore OS files
+desktop.ini
+ehthumbs.db
+
+# Ignore generated archives and backups
+*.zip
+*.tar.gz
+*.rar
+*.bak
+*.tmp
+*copy*
